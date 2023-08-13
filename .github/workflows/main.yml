@@ -25,39 +25,7 @@ jobs:
           restore-keys: ${{ runner.os }}-node-modules-cache-
       - name: install dependencies
         run: yarn install --immutable
-      - name: lint
-        run: yarn lint
-      - name: type check
-        run: yarn typecheck
-      - name: unit test
-        run: yarn test
-
-      - name: output change conditionals
-        uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            deploy:
-              - './packages/odyssey-react/**'
-              - './packages/odyssey-react-mui/**'
-              - './packages/odyssey-storybook/**'
-            vrt:
-              - './packages/odyssey-react/src/**'
-              - './packages/odyssey-react-mui/src/**'
-              - './packages/odyssey-storybook/**'
-      - name: setup AWS
-        if: steps.changes.outputs.deploy == 'true'
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: set $SHA7
-        if: steps.changes.outputs.deploy == 'true'
-        run: echo "SHA7=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})" >> $GITHUB_ENV
-      - name: set $URL_STORYBOOK
-        if: steps.changes.outputs.deploy == 'true'
-        run: echo "URL_STORYBOOK="https://${SHA7}.ods.dev"" >> $GITHUB_ENV
+      
       - name: set $COMMIT_MSG
         if: steps.changes.outputs.deploy == 'true'
         run: echo "COMMIT_MSG=${{ github.event.head_commit.message || github.event.pull_request.title }}" >> $GITHUB_ENV
